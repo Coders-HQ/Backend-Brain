@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  db:
+    image: mariadb
+    env_file:
+      - "./devcontainer.env"
+    environment:
+      cap_add: "SYS_NICE"
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./config/mysql.cnf:/etc/mysql/conf.d/zmysql.cnf"
+      - database:/var/lib/mysql
+  app:
+    image: alchatti/drupal-devcontainer:8.1
+    env_file:
+      - "./devcontainer.env"
+    volumes:
+      - "..:/var/www/html"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PASSWORD: strapi
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8086:80
+volumes:
+  database:
